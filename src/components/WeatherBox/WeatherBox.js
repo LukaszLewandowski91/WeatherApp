@@ -5,14 +5,16 @@ import { useCallback, useState } from "react";
 
 const WeatherBox = (props) => {
   const [weather, setWeather] = useState("");
-  const handleCityChange = useCallback(
-    (city) => {
-      console.log(city);
-      fetch(
-        `http://api.weatherapi.com/v1/current.json?key=e1f9864192514b8691f164842232504&q=${city}&aqi=no`
-      )
-        .then((res) => res.json())
-        .then((data) => {
+  const [pending, setPending] = useState(false);
+
+  const handleCityChange = useCallback((city) => {
+    console.log(city);
+    setPending(true);
+    fetch(
+      `http://api.weatherapi.com/v1/current.json?key=e1f9864192514b8691f164842232504&q=${city}&aqi=no`
+    ).then((res) => {
+      if (res.status === 200) {
+        return res.json().then((data) => {
           console.log(data);
           const weatherData = {
             city: data.location.name,
@@ -21,15 +23,19 @@ const WeatherBox = (props) => {
             description: data.current.condition.text,
           };
           setWeather(weatherData);
+          setPending(false);
         });
-    },
-    [weather]
-  );
+      } else {
+        setPending(false);
+        alert("ERROR!");
+      }
+    });
+  }, []);
   return (
     <section>
       <PickCity action={handleCityChange} />
-      <WeatherSummary {...weather} />
-      <Loader />
+      {weather && !pending && <WeatherSummary {...weather} />}
+      {pending && <Loader />}
     </section>
   );
 };
