@@ -3,7 +3,11 @@ import styles from "./WeatherSummary.module.scss";
 const WeatherSummary = (weather) => {
   return (
     <section className={styles.weatherSummary}>
-      <img className={styles.weatherIcon} alt="????" src={weather.icon} />
+      <img
+        className={styles.weatherIcon}
+        alt={weather.description}
+        src={weather.icon}
+      />
 
       <div className={styles.weatherInfo}>
         <h2>{weather.city}</h2>

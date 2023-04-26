@@ -2,14 +2,17 @@ import PickCity from "../PickCity/PickCity";
 import WeatherSummary from "../WeatherSummary/WeatherSummary";
 import Loader from "../Loader/Loader";
 import { useCallback, useState } from "react";
+import ErrorBox from "../ErrorBox/ErrorBox";
 
 const WeatherBox = (props) => {
   const [weather, setWeather] = useState("");
   const [pending, setPending] = useState(false);
+  const [errorStatus, setErrorStatus] = useState(false);
 
   const handleCityChange = useCallback((city) => {
     console.log(city);
     setPending(true);
+    setErrorStatus(false);
     fetch(
       `http://api.weatherapi.com/v1/current.json?key=e1f9864192514b8691f164842232504&q=${city}&aqi=no`
     ).then((res) => {
@@ -27,7 +30,8 @@ const WeatherBox = (props) => {
         });
       } else {
         setPending(false);
-        alert("ERROR!");
+        setWeather("");
+        setErrorStatus(true);
       }
     });
   }, []);
@@ -36,6 +40,7 @@ const WeatherBox = (props) => {
       <PickCity action={handleCityChange} />
       {weather && !pending && <WeatherSummary {...weather} />}
       {pending && <Loader />}
+      {errorStatus && <ErrorBox />}
     </section>
   );
 };
